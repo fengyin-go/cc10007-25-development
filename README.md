@@ -70,5 +70,39 @@ npm run build
 - 状态流转只允许在 `local-service.ts` 里改，页面组件不做业务判断。
 - 想回到初始数据：清掉浏览器里 `data-layer-studio:entries` 这一项，或调用 `resetModule(模块)`。
 
+## 切换交接单（数据同步：全量快照 → 增量尾流）
+
+「数据同步」页内置**切换交接单**能力，领域代码独立放在 `frontend/src/data/handover/`，
+与通用条目存储分离，持久化在浏览器 `data-layer-studio:handover-manifests`：
+
+| 文件 | 职责 |
+| --- | --- |
+| `handover/types.ts` | 交接单、范围段、封单回执、回放状态等领域类型与状态文案 |
+| `handover/engine.ts` | 纯函数引擎：生成、同笔封单、续写、中断、竞争仲裁、重灌/倒退拦截、回放校验 |
+| `handover/store.ts` | localStorage 持久化，`committed_watermark` 按原始字节存取 |
+| `handover/service.ts` | 页面调用入口，组合引擎规则与持久化 |
+
+落实的工程规则：
+
+- 依据**同步表列表、两端连接、延迟阈值**生成交接单，标出**覆盖带、重叠去重窗、尚未读取的游标**；
+  所有游标在同一根单调轴 `CUR#定长序号` 上，字典序即到达顺序。
+- **同笔封单**：目标落盘与源端水位签收要么一起成功要么整体回滚，写入封单回执与 `cursor_digest`。
+- **中断续写**：只按剩余游标向后推进，未读游标只增不减；**整表重灌请求一律拦截**并留痕。
+- **链路竞争**：同链路并行交接单只认 `sealSeq` 更小的先封单者，落败单置为「已拒绝」；
+  **旧回执不得倒退游标**，倒退申请被拒且水位不动。
+- **持久快照回放**：从持久化字节重建后复算 source / target / ODS 三端 `cursor_digest`，
+  必须三者一致；`committed_watermark` 与封单回执逐字节比对，确认原始字节跨进程保留。
+
+ODS、质量校验（QUAL）、任务监控（MONI）三个页面通过共享组件
+`views/components/HandoverRangeReader.vue` **读取同一份交接单**，分别从贴源读取、质量判定、
+监控告警视角展示「等待 / 覆盖 / 断开」范围；增量水位回看仍集中在数据同步页，以数据同步为主对象。
+
+引擎为不依赖 DOM 的纯函数，可用 Node 直接验证全部规则：
+
+```bash
+cd frontend
+npm run check:handover   # 14 项规则：封单事务、续写不倒退、竞争仲裁、回放 digest/字节一致性
+```
+
 领域：数据工程
 子方向：数仓与数据湖

@@ -67,6 +67,12 @@
       <span>共 {{ total }} 条任务监控记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <HandoverRangeReader
+      consumer="moni"
+      title="监控视角：交接单等待/覆盖/断开范围"
+      desc="MONI 复用数据同步交接单：按延迟阈值监控等待段时长，覆盖带跟踪落盘延迟，断开段直接触发告警。"
+    />
   </section>
 </template>
 
@@ -80,6 +86,7 @@ import {
   runAction as applyAction,
 } from '@/api/local-service'
 import type { EntryRow } from '@/data/types'
+import HandoverRangeReader from '@/views/components/HandoverRangeReader.vue'
 
 const meta = moduleMeta('monitor')
 const columns = ["配置编号", "关联任务", "监控指标", "告警阈值", "告警级别", "静默分钟", "通知渠道", "恢复条件"]

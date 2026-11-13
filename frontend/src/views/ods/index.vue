@@ -67,6 +67,12 @@
       <span>共 {{ total }} 条贴源层建模记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <HandoverRangeReader
+      consumer="ods"
+      title="ODS 读取交接单范围"
+      desc="ODS 读取数据同步封单后的同一份交接单：覆盖带走全量快照，等待段沿增量尾流，断开段停在当前游标不越界。"
+    />
   </section>
 </template>
 
@@ -80,6 +86,7 @@ import {
   runAction as applyAction,
 } from '@/api/local-service'
 import type { EntryRow } from '@/data/types'
+import HandoverRangeReader from '@/views/components/HandoverRangeReader.vue'
 
 const meta = moduleMeta('ods')
 const columns = ["表编号", "源表名称", "目标表名", "同步模式", "分区字段", "保留天数", "字段映射", "增量水位"]

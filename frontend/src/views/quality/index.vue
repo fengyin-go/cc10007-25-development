@@ -67,6 +67,12 @@
       <span>共 {{ total }} 条质量校验记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <HandoverRangeReader
+      consumer="qual"
+      title="质量视角：交接单等待/覆盖/断开范围"
+      desc="QUAL 复用数据同步交接单：覆盖带在重叠去重窗内按主键去重校验，等待段纳入增量巡检，断开段不产出质量结论。"
+    />
   </section>
 </template>
 
@@ -80,6 +86,7 @@ import {
   runAction as applyAction,
 } from '@/api/local-service'
 import type { EntryRow } from '@/data/types'
+import HandoverRangeReader from '@/views/components/HandoverRangeReader.vue'
 
 const meta = moduleMeta('quality')
 const columns = ["规则编号", "校验表名", "目标字段", "校验表达式", "阈值下界", "阈值上界", "采样比例", "阻断级别"]

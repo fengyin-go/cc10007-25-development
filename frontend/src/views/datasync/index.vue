@@ -67,6 +67,8 @@
       <span>共 {{ total }} 条数据同步记录</span>
       <span v-if="errorMessage" class="error-text">{{ errorMessage }}</span>
     </footer>
+
+    <HandoverPanel />
   </section>
 </template>
 
@@ -80,6 +82,7 @@ import {
   runAction as applyAction,
 } from '@/api/local-service'
 import type { EntryRow } from '@/data/types'
+import HandoverPanel from './HandoverPanel.vue'
 
 const meta = moduleMeta('datasync')
 const columns = ["链路编号", "源端连接", "目标端连接", "同步表列表", "全量增量标识", "同步频率", "延迟阈值", "告警接收人"]

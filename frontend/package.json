@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "check:handover": "esbuild engine-check/check-engine.ts --bundle --platform=node --format=esm --outfile=engine-check/.build.mjs && node engine-check/.build.mjs && rm -f engine-check/.build.mjs"
   },
   "dependencies": {
     "pinia": "^2.1.7",
